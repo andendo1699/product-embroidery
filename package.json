@@ -1,0 +1,27 @@
+{
+  "name": "product-embroidery",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx tailwindcss -i ./src/tailwind.css -o ./assets/tailwind.css --minify",
+    "watch": "npx tailwindcss -i ./src/tailwind.css -o ./assets/tailwind.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andendo1699/product-embroidery.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/andendo1699/product-embroidery/issues"
+  },
+  "homepage": "https://github.com/andendo1699/product-embroidery#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^3.4.19"
+  }
+}

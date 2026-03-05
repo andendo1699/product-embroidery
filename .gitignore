@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Tailwind source
+src/
+
+# Build artifacts
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
+*.swo
