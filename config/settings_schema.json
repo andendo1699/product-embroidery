@@ -105,6 +105,28 @@
     "name": "t:settings_schema.typography.name",
     "settings": [
       {
+        "type": "select",
+        "id": "font_source",
+        "label": "Font source",
+        "options":[
+          {
+            "label": "Google font",
+            "value": "google"
+          },
+          {
+            "label": "Shopify font",
+            "value": "shopify"
+          }
+        ],
+        "default": "shopify"
+      },
+      {
+        "type": "text",
+        "id": "google_font",
+        "label": "Google font",
+        "default": "Balsamiq Sans",
+      },
+      {
         "type": "header",
         "content": "t:settings_schema.typography.settings.header__1.content"
       },
