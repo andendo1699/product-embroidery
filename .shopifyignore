@@ -4,3 +4,5 @@ package.json
 package-lock.json
 tailwind.config.js
 postcss.config.js
+templates/*.json
+config/*.json
