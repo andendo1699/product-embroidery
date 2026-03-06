@@ -734,6 +734,10 @@ video {
   padding-bottom: 0.5rem !important;
 }
 
+.text-left {
+  text-align: left;
+}
+
 .uppercase {
   text-transform: uppercase;
 }
@@ -744,6 +748,10 @@ video {
 
 .italic {
   font-style: italic;
+}
+
+.underline {
+  text-decoration-line: underline;
 }
 
 .shadow {
