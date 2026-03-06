@@ -144,19 +144,19 @@ if (!customElements.get('product-personalise')) {
           const mainVariantId = formData.get('id');
           const quantity = parseInt(formData.get('quantity'), 10) || 1;
 
-          // Gather personalisation properties from our custom option inputs
           const personalisationProps = this.getProperties();
 
-          // Build items array: main product with embroidery properties + embroidery charge variant
+          const groupId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
           const items = [
             {
               id: parseInt(mainVariantId, 10),
               quantity: quantity,
-              properties: personalisationProps,
+              properties: { ...personalisationProps, _personalise_group: groupId },
             },
             {
               id: parseInt(this.personaliseVariantId, 10),
               quantity: quantity,
+              properties: { _personalise_group: groupId },
             },
           ];
 

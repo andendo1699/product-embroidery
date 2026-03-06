@@ -121,6 +121,8 @@
                       <tr
                         id="CartDrawer-Item-{{ item.index | plus: 1 }}"
                         class="cart-item{% if item.parent_relationship.parent != null %} cart-item__nested-line{% endif %}"
+                        data-cart-item-key="{{ item.key }}"
+                        {% if item.properties._personalise_group %}data-personalise-group="{{ item.properties._personalise_group }}"{% endif %}
                         {% if item.product.metafields.custom.hide_from_store.value == true %}style="display: none;"{% endif %}
                         role="row"
                         {% if item.parent_relationship.parent != null %}
