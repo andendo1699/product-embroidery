@@ -28,7 +28,7 @@ if (!customElements.get('product-personalise')) {
 
       onToggle() {
         const isChecked = this.checkbox.checked;
-        this.optionsWrapper.style.display = isChecked ? '' : 'none !important';
+        this.optionsWrapper.style.setProperty('display', isChecked ? '' : 'none', isChecked ? '' : 'important');
 
         if (!isChecked) {
           this.optionsWrapper.querySelectorAll('input[type="text"]').forEach((input) => {
