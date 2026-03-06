@@ -1,0 +1,206 @@
+{%- assign personalise_variant = item.product.metafields.custom.personalise_variant.value -%}
+{%- if personalise_variant != blank and item.product.metafields.custom.personalise.value != blank and item.variant.id != personalise_variant.id -%}
+  {%- assign has_personalisation = false -%}
+  {%- assign pg = item.properties._personalise_group -%}
+  {%- if pg != blank -%}
+    {%- assign has_personalisation = true -%}
+  {%- endif -%}
+
+  {%- assign linked_key = '' -%}
+  {%- assign linked_variant_id = '' -%}
+  {%- if has_personalisation -%}
+    {%- for ci in cart.items -%}
+      {%- if ci.properties._personalise_group == pg and ci.key != item.key -%}
+        {%- assign linked_key = ci.key -%}
+        {%- assign linked_variant_id = ci.variant_id -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  <cart-personalise-editor
+    data-item-key="{{ item.key }}"
+    data-linked-key="{{ linked_key }}"
+    data-variant-id="{{ item.variant_id }}"
+    data-linked-variant-id="{{ linked_variant_id }}"
+    data-personalise-variant-id="{{ personalise_variant.id }}"
+    data-personalise-group="{{ pg }}"
+    data-quantity="{{ item.quantity }}"
+    data-has-personalisation="{{ has_personalisation }}"
+    style="display: block; margin-top: 1rem; padding: 1rem; background: #F5F5F5;"
+  >
+    <div class="flex items-center justify-between w-full">
+      <label class="facet-checkbox">
+        <input
+          type="checkbox"
+          data-personalise-toggle
+          {% if has_personalisation %}checked{% endif %}
+        >
+        {{- 'square.svg' | inline_asset_content -}}
+        <div class="svg-wrapper">
+          {{- 'icon-checkmark.svg' | inline_asset_content -}}
+        </div>
+        <span class="facet-checkbox__text">{{ personalise_variant.product.title }} (+{{ personalise_variant.price | money }})</span>
+      </label>
+    </div>
+
+    {%- if has_personalisation -%}
+      <div data-personalise-summary style="font-size: 1.2rem; color: #666; margin-top: 0.4rem; padding-left: 2.4rem;">
+        {%- assign summary_values = '' -%}
+        {%- for prop in item.properties -%}
+          {%- assign pfc = prop.first | slice: 0 -%}
+          {%- if prop.last != blank and pfc == '_' and prop.first != '_personalise_group' -%}
+            {%- assign label = prop.first | slice: 1, 100 -%}
+            {%- if summary_values != '' -%}
+              {%- assign summary_values = summary_values | append: ', ' -%}
+            {%- endif -%}
+            {%- assign summary_values = summary_values | append: label | append: ':  ' | append: prop.last -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {{ summary_values }}
+      </div>
+    {%- endif -%}
+
+    <div data-edit-form style="display: none; margin-top: 1rem;">
+      {%- for option in item.product.metafields.custom.personalise.value -%}
+        {%- assign prop_name = '_' | append: option.label -%}
+        {%- assign current_value = '' -%}
+        {%- for prop in item.properties -%}
+          {%- if prop.first == prop_name -%}
+            {%- assign current_value = prop.last -%}
+            {%- break -%}
+          {%- endif -%}
+        {%- endfor -%}
+
+        <fieldset style="border: none; padding: 0; margin: 0 0 1.2rem;">
+          <legend style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.8rem;">{{ option.label }}</legend>
+
+          {%- if option.type == 'text' -%}
+            <input
+              type="text"
+              name="_{{ option.label }}"
+              value="{{ current_value | escape }}"
+              class="field__input border border-[#D9D9D9] rounded !px-4 !py-2"
+            >
+          {%- endif -%}
+
+          {%- if option.type == 'color' -%}
+            <div class="flex items-center flex-wrap gap-2">
+              {%- for color_item in option.options.value -%}
+                <input
+                  type="radio"
+                  id="cart-edit-{{ item.key | handle }}-{{ option.label | handleize }}-{{ forloop.index }}"
+                  name="_{{ option.label }}"
+                  value="{{ color_item }}"
+                  {% if current_value == color_item %}checked{% endif %}
+                  style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;"
+                >
+                <label
+                  for="cart-edit-{{ item.key | handle }}-{{ option.label | handleize }}-{{ forloop.index }}"
+                  class="personalise-color-swatch"
+                  style="position:relative;display:inline-block;width:3.2rem;height:3.2rem;border-radius:50%;border:1px solid #D9D9D9;cursor:pointer;transition:box-shadow 0.15s ease;background-color:{{ color_item | default: 'white' }};"
+                  title="{{ color_item }}"
+                ></label>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+          {%- if option.type == 'font' -%}
+            <div class="!grid grid-cols-2 gap-2">
+              {%- for font_item in option.options.value -%}
+                <link href="https://fonts.googleapis.com/css2?family={{ font_item | replace: ' ', '+' }}&display=swap" rel="stylesheet">
+                <input
+                  type="radio"
+                  id="cart-edit-{{ item.key | handle }}-{{ option.label | handleize }}-{{ forloop.index }}"
+                  name="_{{ option.label }}"
+                  value="{{ font_item }}"
+                  {% if current_value == font_item %}checked{% endif %}
+                  style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;"
+                >
+                <label
+                  for="cart-edit-{{ item.key | handle }}-{{ option.label | handleize }}-{{ forloop.index }}"
+                  class="personalise-font-option"
+                  style="display:block;width:100%;padding:0.8rem 1.6rem;border:1px solid #D9D9D9;border-radius:0.4rem;text-align:center;cursor:pointer;font-size:1.4rem;transition:border-color 0.15s ease;background:transparent;font-family:'{{ font_item }}',serif;"
+                >
+                  {{ font_item }}
+                </label>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </fieldset>
+      {%- endfor -%}
+
+      <div class="flex gap-2" style="margin-top: 1rem;">
+        <button type="button" data-save style="font-size:1.3rem;padding:0.6rem 1.6rem;background:rgba(var(--color-foreground),1);color:rgb(var(--color-background));border:none;border-radius:0.4rem;cursor:pointer;">
+          Save
+        </button>
+        <button type="button" data-cancel style="font-size:1.3rem;padding:0.6rem 1.6rem;background:transparent;border:1px solid #D9D9D9;border-radius:0.4rem;cursor:pointer;">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </cart-personalise-editor>
+
+  <style>
+    cart-personalise-editor .facet-checkbox {
+      position: relative;
+      font-size: 1.4rem;
+      display: flex;
+      word-break: break-word;
+      align-items: flex-start;
+      cursor: pointer;
+      padding: 0;
+      flex-grow: 1;
+    }
+    cart-personalise-editor .facet-checkbox > svg {
+      background-color: rgb(var(--color-background));
+      margin-right: 1.2rem;
+      flex-shrink: 0;
+    }
+    cart-personalise-editor .facet-checkbox > input[type='checkbox'] {
+      position: absolute;
+      opacity: 1;
+      width: 1.6rem;
+      height: 1.6rem;
+      top: 0.2rem;
+      left: -0.4rem;
+      z-index: -1;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    cart-personalise-editor .facet-checkbox .svg-wrapper {
+      visibility: hidden;
+      position: absolute;
+      left: 0.3rem;
+      z-index: 5;
+      top: 0.5rem;
+      width: 1.1rem;
+      height: 0.7rem;
+    }
+    cart-personalise-editor .facet-checkbox > input[type='checkbox']:checked ~ .svg-wrapper > .icon-checkmark {
+      visibility: visible;
+    }
+    cart-personalise-editor input[type='radio']:checked + .personalise-color-swatch {
+      box-shadow: 0 0 0 1px rgba(var(--color-foreground), 1);
+      border-color: rgba(var(--color-foreground), 1);
+    }
+    cart-personalise-editor .personalise-color-swatch:hover {
+      box-shadow: 0 0 0 1px rgba(var(--color-foreground), 0.4);
+    }
+    cart-personalise-editor input[type='radio']:checked + .personalise-font-option {
+      border-color: rgba(var(--color-foreground), 1);
+      box-shadow: 0 0 0 1px rgba(var(--color-foreground), 1);
+    }
+    cart-personalise-editor .personalise-font-option:hover {
+      border-color: rgba(var(--color-foreground), 0.4);
+    }
+    cart-personalise-editor [data-save]:hover {
+      opacity: 0.85;
+    }
+    cart-personalise-editor [data-save].loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  </style>
+  <script src="{{ 'product-personalise.js' | asset_url }}" defer></script>
+{%- endif -%}
