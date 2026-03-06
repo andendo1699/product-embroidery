@@ -477,6 +477,8 @@
 
               {%- when 'variant_picker' -%}
                 {% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %}
+              {%- when 'personalize' -%}
+                {% render 'product-personalise', product: product, block: block, product_form_id: product_form_id %}
               {%- when 'buy_buttons' -%}
                 {%- render 'buy-buttons',
                   block: block,
@@ -861,6 +863,11 @@
     {
       "type": "quantity_selector",
       "name": "t:sections.main-product.blocks.quantity_selector.name",
+      "limit": 1
+    },
+        {
+      "type": "personalize",
+      "name": "t:sections.main-product.blocks.personalize.name",
       "limit": 1
     },
     {

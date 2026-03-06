@@ -1,9 +1,6 @@
 # Dependencies
 node_modules/
 
-# Tailwind source
-src/
-
 # Build artifacts
 package-lock.json
 
