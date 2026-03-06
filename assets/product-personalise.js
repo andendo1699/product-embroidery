@@ -244,6 +244,7 @@ if (!customElements.get('cart-personalise-editor')) {
         this.saveBtn = this.querySelector('[data-save]');
         this.cancelBtn = this.querySelector('[data-cancel]');
         this.hasPersonalisation = this.dataset.hasPersonalisation === 'true';
+        this._busy = false;
       }
 
       connectedCallback() {
@@ -253,6 +254,10 @@ if (!customElements.get('cart-personalise-editor')) {
       }
 
       onToggle() {
+        if (this._busy) {
+          this.checkbox.checked = !this.checkbox.checked;
+          return;
+        }
         if (this.checkbox.checked) {
           this.showForm();
         } else {
@@ -301,6 +306,18 @@ if (!customElements.get('cart-personalise-editor')) {
         return cartItems ? cartItems.getSectionsToRender().map((s) => s.section || s.id) : [];
       }
 
+      enableLoading() {
+        this._busy = true;
+        const target = document.getElementById('CartDrawer') || document.getElementById('main-cart-items');
+        if (target) target.classList.add('loading');
+      }
+
+      disableLoading() {
+        this._busy = false;
+        const target = document.getElementById('CartDrawer') || document.getElementById('main-cart-items');
+        if (target) target.classList.remove('loading');
+      }
+
       refreshCart() {
         const cartItems = this.getCartItems();
         if (cartItems) {
@@ -311,6 +328,8 @@ if (!customElements.get('cart-personalise-editor')) {
       }
 
       async removePersonalisation() {
+        if (this._busy) return;
+        this.enableLoading();
         const itemKey = this.dataset.itemKey;
         const linkedKey = this.dataset.linkedKey;
         const variantId = parseInt(this.dataset.variantId, 10);
@@ -343,10 +362,14 @@ if (!customElements.get('cart-personalise-editor')) {
         } catch (e) {
           console.error(e);
           this.checkbox.checked = true;
+        } finally {
+          this.disableLoading();
         }
       }
 
       async save() {
+        if (this._busy) return;
+        this.enableLoading();
         this.saveBtn.classList.add('loading');
         this.saveBtn.textContent = 'Saving...';
 
@@ -398,6 +421,7 @@ if (!customElements.get('cart-personalise-editor')) {
         } finally {
           this.saveBtn.classList.remove('loading');
           this.saveBtn.textContent = 'Save';
+          this.disableLoading();
         }
       }
     }
