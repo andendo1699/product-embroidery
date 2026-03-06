@@ -150,14 +150,29 @@ class CartItems extends HTMLElement {
 
     this.enableLoading(line);
 
-    const body = JSON.stringify({
-      line,
-      quantity,
-      sections: this.getSectionsToRender().map((section) => section.section),
-      sections_url: window.location.pathname,
-    });
+    const sections = this.getSectionsToRender().map((section) => section.section);
 
-    fetch(`${routes.cart_change_url}`, { ...fetchConfig(), ...{ body } })
+    const lineItem = document.getElementById(`CartItem-${line}`) || document.getElementById(`CartDrawer-Item-${line}`);
+    const personaliseGroup = lineItem?.dataset?.personaliseGroup;
+
+    let body;
+    let fetchUrl;
+
+    if (personaliseGroup) {
+      const linkedItems = document.querySelectorAll(`[data-personalise-group="${personaliseGroup}"]`);
+      const updates = {};
+      linkedItems.forEach((el) => {
+        const key = el.dataset.cartItemKey;
+        if (key) updates[key] = quantity;
+      });
+      body = JSON.stringify({ updates, sections, sections_url: window.location.pathname });
+      fetchUrl = `${routes.cart_update_url}`;
+    } else {
+      body = JSON.stringify({ line, quantity, sections, sections_url: window.location.pathname });
+      fetchUrl = `${routes.cart_change_url}`;
+    }
+
+    fetch(fetchUrl, { ...fetchConfig(), ...{ body } })
       .then((response) => {
         return response.text();
       })
