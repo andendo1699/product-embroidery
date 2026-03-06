@@ -10,6 +10,8 @@
 {
   "current": {
     "logo_width": 90,
+    "font_source": "google",
+    "google_font": "Balsamiq Sans",
     "type_header_font": "assistant_n4",
     "heading_scale": 100,
     "type_body_font": "assistant_n4",

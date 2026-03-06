@@ -16,6 +16,8 @@
   {{ 'component-rating.css' | asset_url | stylesheet_tag }}
   {{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
 
+
+
   {% unless product.has_only_default_variant %}
     {{ 'component-product-variant-picker.css' | asset_url | stylesheet_tag }}
     {{ 'component-swatch-input.css' | asset_url | stylesheet_tag }}
@@ -477,6 +479,8 @@
 
               {%- when 'variant_picker' -%}
                 {% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %}
+              {%- when 'personalize' -%}
+                {% render 'product-personalise', product: product, block: block, product_form_id: product_form_id %}
               {%- when 'buy_buttons' -%}
                 {%- render 'buy-buttons',
                   block: block,
@@ -586,6 +590,7 @@
                                     limit: block.settings.products_per_page
                                     offset: continue
                                   -%}
+                                    {% if product.metafields.custom.hide_from_store.value != true %}
                                     <li>
                                       {%- if block.settings.enable_quick_add -%}
                                         {% assign quick_add = 'standard' %}
@@ -605,6 +610,7 @@
                                       %}
                                     </li>
                                     {%- assign skip_card_product_styles = true -%}
+                                    {% endif %}
                                   {%- endfor -%}
                                 </ul>
                               </div>
@@ -861,6 +867,11 @@
     {
       "type": "quantity_selector",
       "name": "t:sections.main-product.blocks.quantity_selector.name",
+      "limit": 1
+    },
+        {
+      "type": "personalize",
+      "name": "t:sections.main-product.blocks.personalize.name",
       "limit": 1
     },
     {

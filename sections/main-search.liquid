@@ -271,6 +271,7 @@
                   >
                     {%- case item.object_type -%}
                       {%- when 'product' -%}
+                        {% if product.metafields.custom.hide_from_store.value != true %}
                         {%- capture product_settings -%}{%- if section.settings.product_show_vendor -%}vendor,{%- endif -%}title,price{%- endcapture -%}
                         {% render 'card-product',
                           card_product: item,
@@ -283,6 +284,7 @@
                           skip_styles: skip_card_product_styles
                         %}
                         {%- assign skip_card_product_styles = true -%}
+                        {% endif %}
                       {%- when 'article' -%}
                         {% render 'article-card',
                           article: item,

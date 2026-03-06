@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
+*.swo

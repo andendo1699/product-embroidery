@@ -82,6 +82,7 @@
                   <tr
                     class="cart-item {% if item.parent_relationship.parent != null %}cart-item__nested-line{% endif %}"
                     id="CartItem-{{ item.index | plus: 1 }}"
+                    {% if item.product.metafields.custom.hide_on_store.value == true %}style="display: none;"{% endif %}
                     {% if item.parent_relationship.parent != null %}
                       aria-label="{{- 'products.product.nested_label' | t: title: item.product.title, parent_title: item.parent_relationship.parent.title | escape -}}"
                     {% endif %}

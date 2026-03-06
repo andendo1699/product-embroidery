@@ -10,7 +10,13 @@
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
     {%- endif -%}
-
+    {% if settings.font_source == 'google' %}
+      {%- if settings.google_font != blank -%}
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family={{ settings.google_font | strip | replace: ' ', '+' }}:ital,wght@0,400;0,900;1,400;1,900&display=swap" rel="stylesheet">
+      {%- endif -%}
+    {%- endif -%}
     {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
       <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     {%- endunless -%}
@@ -48,11 +54,13 @@
     %}
 
     {% style %}
-      {{ settings.type_body_font | font_face: font_display: 'swap' }}
-      {{ body_font_bold | font_face: font_display: 'swap' }}
-      {{ body_font_italic | font_face: font_display: 'swap' }}
-      {{ body_font_bold_italic | font_face: font_display: 'swap' }}
-      {{ settings.type_header_font | font_face: font_display: 'swap' }}
+      {% if settings.font_source == 'shopify' %}
+        {{ settings.type_body_font | font_face: font_display: 'swap' }}
+        {{ body_font_bold | font_face: font_display: 'swap' }}
+        {{ body_font_italic | font_face: font_display: 'swap' }}
+        {{ body_font_bold_italic | font_face: font_display: 'swap' }}
+        {{ settings.type_header_font | font_face: font_display: 'swap' }}
+      {% endif %}
 
       {% for scheme in settings.color_schemes -%}
         {% assign scheme_classes = scheme_classes | append: ', .color-' | append: scheme.id %}
@@ -100,6 +108,16 @@
       }
 
       :root {
+
+        {% if settings.font_source == 'google' %}
+          --font-body-family: '{{ settings.google_font }}', {{ settings.type_body_font.fallback_families }};
+          --font-heading-family: '{{ settings.google_font }}', {{ settings.type_header_font.fallback_families }};
+          --font-body-style: 'normal';
+          --font-body-weight: 400;
+          --font-body-weight-bold: 700;
+          --font-heading-style: 'normal';
+          --font-heading-weight: 400;
+        {% else %}
         --font-body-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
         --font-body-style: {{ settings.type_body_font.style }};
         --font-body-weight: {{ settings.type_body_font.weight }};
@@ -108,7 +126,7 @@
         --font-heading-family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
         --font-heading-style: {{ settings.type_header_font.style }};
         --font-heading-weight: {{ settings.type_header_font.weight }};
-
+        {% endif %}
         --font-body-scale: {{ settings.body_scale | divided_by: 100.0 }};
         --font-heading-scale: {{ settings.heading_scale | times: 1.0 | divided_by: settings.body_scale }};
 
@@ -254,7 +272,7 @@
         }
       }
     {% endstyle %}
-
+    {{ 'tailwind.css' | asset_url | stylesheet_tag }}
     {{ 'base.css' | asset_url | stylesheet_tag }}
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 

@@ -1,0 +1,231 @@
+{% if product.metafields.custom.personalise_variant.value != blank %}
+  {% assign personalise_variant = product.metafields.custom.personalise_variant.value %}
+
+  <style>
+    product-personalise .facet-checkbox {
+      position: relative;
+      font-size: 1.4rem;
+      display: flex;
+      word-break: break-word;
+      align-items: center;
+      cursor: pointer;
+      padding: 0;
+      flex-grow: 1;
+    }
+    product-personalise .facet-checkbox > svg {
+      background-color: rgb(var(--color-background));
+      margin-right: 1.2rem;
+      flex-shrink: 0;
+    }
+    product-personalise .facet-checkbox > input[type='checkbox'] {
+      position: absolute;
+      opacity: 1;
+      width: 1.6rem;
+      height: 1.6rem;
+      top: 0.2rem;
+      left: -0.4rem;
+      z-index: -1;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    product-personalise .facet-checkbox .svg-wrapper {
+      visibility: hidden;
+      position: absolute;
+      left: 0.3rem;
+      z-index: 5;
+      top: 0.5rem;
+      width: 1.1rem;
+      height: 0.7rem;
+    }
+    product-personalise .facet-checkbox > input[type='checkbox']:checked ~ .svg-wrapper > .icon-checkmark {
+      visibility: visible;
+    }
+
+    /* Hide radio inputs */
+    product-personalise input[type='radio'] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    /* Color swatch */
+    product-personalise .personalise-color-swatch {
+      position: relative;
+      display: inline-block;
+      width: 3.2rem;
+      height: 3.2rem;
+      border-radius: 50%;
+      border: 1px solid #D9D9D9;
+      cursor: pointer;
+      transition: box-shadow 0.15s ease;
+    }
+    product-personalise .personalise-color-swatch:hover {
+      box-shadow: 0 0 0 1px rgba(var(--color-foreground), 0.4);
+    }
+    product-personalise input[type='radio']:checked + .personalise-color-swatch {
+      box-shadow: 0 0 0 1px rgba(var(--color-foreground), 1);
+      border-color: rgba(var(--color-foreground), 1);
+    }
+
+    /* Font option */
+    product-personalise .personalise-font-option {
+      display: block;
+      width: 100%;
+      padding: 0.8rem 1.6rem;
+      border: 1px solid #D9D9D9;
+      border-radius: 0.4rem;
+      text-align: center;
+      cursor: pointer;
+      font-size: 1.4rem;
+      transition: border-color 0.15s ease;
+      background: transparent;
+    }
+    product-personalise .personalise-font-option:hover {
+      border-color: rgba(var(--color-foreground), 0.4);
+    }
+    product-personalise input[type='radio']:checked + .personalise-font-option {
+      border-color: rgba(var(--color-foreground), 1);
+      box-shadow: 0 0 0 1px rgba(var(--color-foreground), 1);
+    }
+
+    /* Custom options layout */
+    product-personalise #custom-options {
+      flex: 1;
+    }
+    product-personalise #custom-options fieldset {
+      border: none;
+      padding: 0;
+      margin: 0 0 1.2rem;
+    }
+    product-personalise #custom-options legend {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+    }
+
+    .preview-personalise-media__wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      max-width: 300px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #D9D9D9;
+    }
+    .preview-personalise-media__wrapper img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+    .preview-personalise-media__overlay {
+      position: absolute;
+      bottom: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .preview-personalise-media__overlay span {
+      font-size: 2rem;
+      color: #ffffff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      letter-spacing: 0.05em;
+    }
+  </style>
+  <product-personalise
+    class="block w-full p-4 bg-[#F5F5F5]"
+    data-personalise-variant-id="{{ personalise_variant.id }}"
+    data-personalise-price="{{ personalise_variant.price }}"
+  >
+    <div class="flex items-center justify-between w-full">
+      <label class="facet-checkbox">
+        <input
+          type="checkbox"
+          name="personalise"
+          value="{{ personalise_variant.id }}"
+          data-personalise-toggle
+        >
+        {{- 'square.svg' | inline_asset_content -}}
+        <div class="svg-wrapper">
+          {{- 'icon-checkmark.svg' | inline_asset_content -}}
+        </div>
+        <span class="facet-checkbox__text">{{ personalise_variant.product.title }}</span>
+      </label>
+      <span>{{ personalise_variant.price | money }}</span>
+    </div>
+    <div class="!grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 mt-4" data-personalise-options style="display: none !important;">
+      <div id="custom-options">
+        {% for option in product.metafields.custom.personalise.value %}
+          <fieldset class="product-form__input ">
+            <legend class="form__label">{{ option.label }}</legend>
+            {% if option.type == 'text' %}
+              <input type="text" name="properties[_{{ option.label }}]" class="field__input  border border-[#D9D9D9] rounded !px-4 !py-2">
+            {% endif %}
+            {% if option.type == 'color' %}
+              <div class="flex items-center flex-wrap gap-2">
+                {% for item in option.options.value %}
+                  <input
+                    type="radio"
+                    id="{{ product_form_id }}_{{ option.label }}_{{ item }}"
+                    name="properties[_{{ option.label }}]"
+                    value="{{ item }}"
+                  >
+                  <label
+                    for="{{ product_form_id }}_{{ option.label }}_{{ item }}"
+                    class="personalise-color-swatch"
+                    style="background-color: {{ item | default: 'white' }};"
+                    title="{{ item }}"
+                  ></label>
+                {% endfor %}
+              </div>
+            {% endif %}
+            {% if option.type == 'font' %}
+              <div class="!grid grid-cols-2 gap-2">
+                {% for item in option.options.value %}
+                  <link href="https://fonts.googleapis.com/css2?family={{ item | replace: ' ', '+' }}&display=swap" rel="stylesheet">
+                  <input
+                    type="radio"
+                    id="{{ product_form_id }}_{{ option.label }}_{{ item }}"
+                    name="properties[_{{ option.label }}]"
+                    value="{{ item }}"
+                  >
+                  <label
+                    for="{{ product_form_id }}_{{ option.label }}_{{ item }}"
+                    class="personalise-font-option"
+                    style="font-family: '{{ item }}', serif;"
+                  >
+                    {{ item }}
+                  </label>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </fieldset>
+        {% endfor %}
+      </div>
+      <div class="preview-personalise-media" data-preview-media>
+        {%- assign preview_image = product.selected_or_first_available_variant.featured_media | default: product.featured_media -%}
+        {%- if preview_image -%}
+          <div class="preview-personalise-media__wrapper">
+            <img
+              src="{{ preview_image | image_url: width: 600 }}"
+              alt="{{ product.title | escape }}"
+              width="300"
+              height="300"
+              loading="lazy"
+              data-preview-image
+            >
+            <div class="preview-personalise-media__overlay" data-preview-overlay>
+              <span data-preview-text></span>
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </product-personalise>
+
+  <script src="{{ 'product-personalise.js' | asset_url }}" defer ></script>
+{% endif %}
