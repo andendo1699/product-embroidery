@@ -1,3 +1,8 @@
+const normalizePropertyName = (name = '') => {
+  const match = name.replace(/^properties\[(.+)\]$/, '$1');
+  return match ? match : name;
+};
+
 if (!customElements.get('product-personalise')) {
   customElements.define(
     'product-personalise',
@@ -28,7 +33,7 @@ if (!customElements.get('product-personalise')) {
 
       onToggle() {
         const isChecked = this.checkbox.checked;
-        this.optionsWrapper.style.setProperty('display', isChecked ? '' : 'none', isChecked ? '' : 'important');
+        this.optionsWrapper.classList.toggle('!hidden', !isChecked);
 
         if (!isChecked) {
           this.optionsWrapper.querySelectorAll('input[type="text"]').forEach((input) => {
@@ -99,11 +104,14 @@ if (!customElements.get('product-personalise')) {
         const properties = {};
         this.optionsWrapper.querySelectorAll('input[type="text"]').forEach((input) => {
           if (input.value.trim()) {
-            properties[input.name] = input.value.trim();
+            const key = normalizePropertyName(input.name);
+            properties[key] = input.value;
+
           }
         });
         this.optionsWrapper.querySelectorAll('input[type="radio"]:checked').forEach((input) => {
-          properties[input.name] = input.value;
+          const key = normalizePropertyName(input.name);
+          properties[key] = input.value;
         });
         return properties;
       }
@@ -266,18 +274,18 @@ if (!customElements.get('cart-personalise-editor')) {
       }
 
       showForm() {
-        this.editForm.style.display = '';
-        if (this.summary) this.summary.style.display = 'none';
+        this.editForm.classList.remove('hidden');
+        if (this.summary) this.summary.classList.add('hidden');
       }
 
       hideForm() {
-        this.editForm.style.display = 'none';
+        this.editForm.classList.add('hidden');
       }
 
       cancel() {
         if (this.hasPersonalisation) {
           this.hideForm();
-          if (this.summary) this.summary.style.display = '';
+          if (this.summary) this.summary.classList.remove('hidden');
         } else {
           this.checkbox.checked = false;
           this.hideForm();
@@ -288,11 +296,13 @@ if (!customElements.get('cart-personalise-editor')) {
         const properties = {};
         this.editForm.querySelectorAll('input[type="text"]').forEach((input) => {
           if (input.value.trim()) {
-            properties[input.name] = input.value.trim();
+            const key = normalizePropertyName(input.name);
+            properties[key] = input.value.trim();
           }
         });
         this.editForm.querySelectorAll('input[type="radio"]:checked').forEach((input) => {
-          properties[input.name] = input.value;
+          const key = normalizePropertyName(input.name);
+          properties[key] = input.value;
         });
         return properties;
       }
